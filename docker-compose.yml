@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    env_file:
+      - .env
+    expose:
+      - 27017
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mongo',
+          'admin',
+          '--port',
+          '27017',
+          '--eval',
+          "db.adminCommand('ping').ok"
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    ports:
+      - 27017:27017
