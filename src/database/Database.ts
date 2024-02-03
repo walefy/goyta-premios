@@ -15,13 +15,13 @@ export class Database implements IDatabase {
       console.log('🔗 Database connection successful');
     } catch (error) {
       console.error(error);
-      throw new Error('❌ Database connection error')
+      throw new Error('Database connection error')
     }
   }
 
   #validate() {
     if (this.#connectionString.trim() === '') {
-      throw new Error('invalid connection string');
+      throw new Error('Invalid connection string');
     }
   }
 }
