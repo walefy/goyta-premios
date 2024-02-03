@@ -33,7 +33,7 @@ export class App {
   public async start(PORT: string | number): Promise<void> {
     try {
       await this.#database.connect();
-      this.#app.listen(PORT, () => console.log(`Running on port ${PORT}`));
+      this.#app.listen(PORT, () => console.log(`📡 Running on port ${PORT}`));
     } catch (error) {
       let message = 'Unknown error';
       if (error instanceof Error) message = error.message;

@@ -15,7 +15,7 @@ export class Database implements IDatabase {
       console.log('🔗 Database connection successful');
     } catch (error) {
       console.error(error);
-      throw new Error('Database connection error')
+      throw new Error('❌ Database connection error')
     }
   }
 
