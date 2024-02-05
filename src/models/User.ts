@@ -31,17 +31,21 @@ export class UserModelMongo implements IUserModel {
   }
 
   async update(id: IUser['id'], partialUser: Partial<UserWithoutId>) {
-    const user = await User.findByIdAndUpdate(id, { ...partialUser });
+    await User.updateOne({ _id: id }, { ...partialUser });
+
+    const user = await this.findById(id);
 
     if (!user) {
       throw new Error('User not found!');
     }
 
-    return this.#clearUser(user);
+    return user;
   }
 
   async delete(id: string) {
-    const user = await User.findByIdAndDelete(id);
+    await User.deleteOne({ _id: id });
+
+    const user = await this.findById(id);
 
     if (!user) return true;
     return false;

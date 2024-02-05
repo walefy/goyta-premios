@@ -11,7 +11,9 @@ export const validateSchema = (schema: ZodSchema<any>, data: any): ValidationRes
     return { valid: true, error: null };
   } catch (error) {
     if (error instanceof ZodError) {
-      const errors = error.errors.map((err) => err.message);
+      const errors = error.errors.map((err) => {
+        return err.message + ' at ' + err.path.join('.');
+      });
       return { valid: false, error: errors.join(', ')};
     }
 
