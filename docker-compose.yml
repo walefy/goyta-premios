@@ -8,9 +8,10 @@ services:
     env_file:
       - .env
     expose:
-      - 3000
+      - 3001
     ports:
-      - 3000:3000
+      - 3001:3001
+    command: dev
     volumes:
       - .:/app
     depends_on:

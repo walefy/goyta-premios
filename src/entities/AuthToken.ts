@@ -6,7 +6,7 @@ export class TokenAuth implements IAuthToken {
   #secretKey: string;
 
   constructor() {
-    this.#secretKey = process.env.SECRET_KEY || 'secretKeyToken@12$56';
+    this.#secretKey = process.env.JWT_SECRET_KEY || 'secretKeyToken@12$56';
   }
 
   sign(payload: CreationPayloadType) {

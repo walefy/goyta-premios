@@ -1,5 +1,6 @@
 import express from 'express';
 import { IDatabase } from './interfaces/IDatabase';
+import { mainRouter } from './routes';
 
 export class App {
   #app: express.Express;
@@ -14,8 +15,7 @@ export class App {
   }
 
   #routes(): void {
-    // this.app.use(mainRouter);
-    console.log('not implemented');
+    this.#app.use(mainRouter);
   }
 
   #config(): void {
