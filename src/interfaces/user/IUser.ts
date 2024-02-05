@@ -9,4 +9,4 @@ export interface IUser {
 
 export type UserWithoutId = Omit<IUser, 'id'>;
 export type UserWithoutPassword = Omit<IUser, 'password'>;
-export type CreationUser = Omit<IUser, 'id' | 'password'>;
+export type CreationUser = Omit<IUser, 'id'>;

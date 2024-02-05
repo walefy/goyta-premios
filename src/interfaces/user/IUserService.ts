@@ -1,10 +1,10 @@
 import { IServiceResponse } from '../IServiceResponse';
-import { CreationUser, User, UserWithoutId, UserWithoutPassword } from './IUser';
+import { CreationUser, IUser, UserWithoutId, UserWithoutPassword } from './IUser';
 
 export interface IUserService {
-  create(newUser: CreationUser): Promise<IServiceResponse<UserWithoutPassword>>;
-  findById(id: User['id']): Promise<IServiceResponse<UserWithoutPassword>>;
+  create(newUser: CreationUser): Promise<IServiceResponse<string>>;
+  findById(id: IUser['id']): Promise<IServiceResponse<UserWithoutPassword | null>>;
   findAll(): Promise<IServiceResponse<UserWithoutPassword[]>>;
-  update(partialUser: Partial<UserWithoutId>): Promise<IServiceResponse<UserWithoutPassword>>;
-  delete(id: User['id']): Promise<IServiceResponse<void>>;
+  update(id: IUser['id'], partialUser: Partial<UserWithoutId>): Promise<IServiceResponse<UserWithoutPassword>>;
+  delete(id: IUser['id']): Promise<IServiceResponse<null>>;
 }

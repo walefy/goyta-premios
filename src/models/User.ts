@@ -13,8 +13,14 @@ export class UserModelMongo implements IUserModel {
     return users.map((user) => this.#clearUser(user));
   }
 
-  async findById(id: IUser['id']): Promise<IUser | null> {
+  async findById(id: IUser['id']) {
     const user = await User.findById(id);
+    if (!user) return null;
+    return this.#clearUser(user);
+  }
+
+  async findByEmail(email: string) {
+    const user = await User.findOne({ email });
     if (!user) return null;
     return this.#clearUser(user);
   }
@@ -25,25 +31,23 @@ export class UserModelMongo implements IUserModel {
   }
 
   async update(id: IUser['id'], partialUser: Partial<UserWithoutId>) {
-    await User.updateOne({ id }, { ...partialUser });
-    const user = await this.findById(id);
+    const user = await User.findByIdAndUpdate(id, { ...partialUser });
 
     if (!user) {
-      throw new Error('User not found after updated');
+      throw new Error('User not found!');
     }
 
-    return user;
+    return this.#clearUser(user);
   }
 
-  async delete(id: string): Promise<boolean> {
-    await User.deleteOne({ id });
-    
-    const user = await this.findById(id);
+  async delete(id: string) {
+    const user = await User.findByIdAndDelete(id);
+
     if (!user) return true;
     return false;
   }
 
-  #clearUser(user: UserWithMongoId) {
+  #clearUser(user: UserWithMongoId): IUser {
     const { _id, ...userWithPass } = user.toJSON();
     return userWithPass;
   }
