@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { IUserService } from '../interfaces/user/IUserService';
-import { TokenPayload } from '../interfaces/AuthToken/TokenPayload';
 
 export class UserController {
   #service: IUserService;

@@ -54,7 +54,6 @@ export class UserService implements IUserService {
     }
 
     const hashedPassword = await this.#password.hash(newUser.password);
-    console.log('newUser', newUser);
     const user = await this.#model.create({ ...newUser, password: hashedPassword });
     const { id, email, name } = this.#removePassword(user);
     const token = this.#tokenAuth.sign({ id, email, name, role: 'user' });
