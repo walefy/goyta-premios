@@ -7,6 +7,7 @@ type ResponseWithToken = {
 
 export interface IUserService {
   create(newUser: CreationUser): Promise<IServiceResponse<ResponseWithToken>>;
+  createAdmin(newUser: CreationUser, pass: string): Promise<IServiceResponse<ResponseWithToken>>;
   login(email: IUser['email'], password: IUser['password']): Promise<IServiceResponse<ResponseWithToken>>;
   findById(id: IUser['id']): Promise<IServiceResponse<UserWithoutPassword | null>>;
   findAll(): Promise<IServiceResponse<UserWithoutPassword[]>>;

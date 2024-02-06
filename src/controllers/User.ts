@@ -26,6 +26,17 @@ export class UserController {
     return res.status(status).json(data);
   }
 
+  async createAdmin(req: Request, res: Response) {
+    const { name, email, password, phone, tokenAdmin } = req.body;
+
+    const { status, data } = await this.#service.createAdmin(
+      { name, email, password, phone },
+      tokenAdmin
+    );
+
+    return res.status(status).json(data);
+  }
+
   async findById(req: Request, res: Response) {
     const { id } = req.params;
 

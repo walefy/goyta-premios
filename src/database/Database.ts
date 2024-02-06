@@ -19,6 +19,16 @@ export class Database implements IDatabase {
     }
   }
 
+  async disconnect() {
+    try {
+      await mongoose.disconnect();
+      console.log('🔗 Database disconnected');
+    } catch (error) {
+      console.error(error);
+      throw new Error('Database disconnection error')
+    }
+  }
+
   #validate() {
     if (this.#connectionString.trim() === '') {
       throw new Error('Invalid connection string');

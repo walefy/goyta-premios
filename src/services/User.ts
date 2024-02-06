@@ -54,9 +54,43 @@ export class UserService implements IUserService {
     }
 
     const hashedPassword = await this.#password.hash(newUser.password);
-    const user = await this.#model.create({ ...newUser, password: hashedPassword });
-    const { id, email, name } = this.#removePassword(user);
-    const token = this.#tokenAuth.sign({ id, email, name, role: 'user' });
+    const user = await this.#model.create({ ...newUser, password: hashedPassword }, 'user');
+    const { id, email, name, role } = user;
+    const token = this.#tokenAuth.sign({ id, email, name, role });
+    return { status: HttpStatusCode.CREATED, data: { token } };
+  }
+
+  async createAdmin(newUser: CreationUser, tokenAdmin: string) {
+    const validation = validateSchema(userCreationSchema, newUser);
+
+    if (!validation.valid) {
+      return {
+        status: HttpStatusCode.BAD_REQUEST,
+        data: { message: validation.error || 'Invalid data' },
+      };
+    }
+
+    if (tokenAdmin !== process.env.ADMIN_PASS) {
+      return {
+        status: HttpStatusCode.UNAUTHORIZED,
+        data: { message: 'Invalid tokenAdmin' }
+      };
+    }
+
+    const userExists = await this.#model.findByEmail(newUser.email);
+    if (userExists) {
+      return {
+        status: HttpStatusCode.CONFLICT,
+        data: { message: 'User already registered' }
+      };
+    }
+
+    const hashedPassword = await this.#password.hash(newUser.password);
+    const user = await this.#model.create({ ...newUser, password: hashedPassword }, 'admin');
+    
+    const { id, email, name, role } = user;
+    
+    const token = this.#tokenAuth.sign({ id, email, name, role });
     return { status: HttpStatusCode.CREATED, data: { token } };
   }
   
@@ -87,8 +121,8 @@ export class UserService implements IUserService {
       };
     }
 
-    const { id, name } = user;
-    const token = this.#tokenAuth.sign({ id, email, name, role: 'user' });
+    const { id, name, role } = user;
+    const token = this.#tokenAuth.sign({ id, email, name, role });
     return { status: HttpStatusCode.OK, data: { token } };
   }
 

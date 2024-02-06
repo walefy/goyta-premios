@@ -25,8 +25,8 @@ export class UserModelMongo implements IUserModel {
     return this.#clearUser(user);
   }
   
-  async create(newUser: CreationUser) {
-    const user = await User.create(newUser);
+  async create(newUser: CreationUser, role: IUser['role']) {
+    const user = await User.create({ ...newUser, role });
     return this.#clearUser(user);
   }
 

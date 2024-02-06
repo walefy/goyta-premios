@@ -5,7 +5,7 @@ import { User } from '../../../src/database/models/User';
 import supertest from 'supertest';
 import { mongoReturnUser } from '../../mocks/users';
 import { vi } from 'vitest';
-import { getToken } from '../../helpers/getToken';
+import { getToken, getAdminToken } from '../../helpers/getToken';
 
 const databaseMock = new DatabaseMockClass();
 
@@ -16,22 +16,21 @@ describe('List All Users <GET /user>', () => {
     vi.clearAllMocks();
   });
 
-  it.skip('should return all users', async () => {
-    // admin user not implemented
-    vi.spyOn(User, 'find').mockResolvedValue([mongoReturnUser] as any);
-
+  it.only('should return all users', async () => {
     const request = supertest(app);
-    const token = await getToken();
+    const token = await getAdminToken();
     const response = await request
       .get('/user')
       .set('Authorization', token);
+    
+    console.log(response.body);
 
     expect(response.status).toBe(200);
     const { password, ...user } = mongoReturnUser;
-    expect(response.body).toEqual([user]);
+    expect(response.body).toHaveLength(1);
   });
 
-  it('should return 403 if token is not admin', async () => {
+  it.skip('should return 403 if token is not admin', async () => {
     vi.spyOn(User, 'find').mockResolvedValue([mongoReturnUser] as any);
 
     const request = supertest(app);

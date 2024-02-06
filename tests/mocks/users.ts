@@ -20,7 +20,7 @@ const toJSON = (data: any) => {
   return data;
 };
 
-const getMongoUser = () => {
+const getMongoUser = (role: 'user' | 'admin' = 'user') => {
   const user = {
     ...getMongoId(),
     toJSON: () => toJSON(user),
@@ -29,6 +29,7 @@ const getMongoUser = () => {
     name: 'Test User',
     phone: '11111111111',
     image: 'https://www.google.com',
+    role,
   };
 
   return user;
@@ -44,4 +45,8 @@ export const validCreationUser: CreationUser = {
 
 export const mongoReturnUser = {
   ...getMongoUser()
-}
+};
+
+export const mongoReturnAdmin = {
+  ...getMongoUser('admin'),
+};

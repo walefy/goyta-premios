@@ -30,4 +30,5 @@ userRouter.put(
 userRouter.delete('/:id', jwtAuth(), isSameUser, (req: Request, res: Response) =>
   userController.delete(req, res));
 
+userRouter.post('/admin', (req: Request, res: Response) => userController.createAdmin(req, res));
 userRouter.post('/login', (req: Request, res: Response) => userController.login(req, res));
