@@ -5,6 +5,7 @@ export interface IUser {
   password: string;
   phone: string;
   image?: string;
+  role: 'user' | 'admin';
 }
 
 export type UserWithoutId = Omit<IUser, 'id'>;

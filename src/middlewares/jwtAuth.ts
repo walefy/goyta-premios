@@ -20,6 +20,5 @@ export const jwtAuth = (needsAdmin = false) => (req: Request, res: Response, nex
     return res.status(403).json({ message: 'You do not have permission' });
   }
 
-  res.locals.user = decoded;
   next();
 };

@@ -19,6 +19,11 @@ const userSchema = new Schema<IUser>({
     required: true,
   },
   image: String,
+  role: {
+    type: String,
+    required: true,
+    default: 'user',
+  },
 });
 
 userSchema.set('toJSON', {
