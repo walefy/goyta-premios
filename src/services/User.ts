@@ -93,7 +93,7 @@ export class UserService implements IUserService {
     const token = this.#tokenAuth.sign({ id, email, name, role });
     return { status: HttpStatusCode.CREATED, data: { token } };
   }
-  
+
   async login(email: string, password: string) {
     const validation = validateSchema(loginSchema, { email, password });
     if (!validation.valid) {

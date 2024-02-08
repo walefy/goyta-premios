@@ -1,4 +1,4 @@
-import { Schema, Document, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { IUser } from '../../interfaces/user/IUser';
 
 const userSchema = new Schema<IUser>({
@@ -24,14 +24,6 @@ const userSchema = new Schema<IUser>({
     required: true,
     default: 'user',
   },
-});
-
-userSchema.set('toJSON', {
-  virtuals: true,
-  versionKey: false,
-  transform: function (doc, ret) {
-    delete ret._id;
-  }
-});
+}, { versionKey: false });
 
 export const User = model<IUser>('User', userSchema);

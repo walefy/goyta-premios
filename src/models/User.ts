@@ -1,11 +1,7 @@
 import { IUserModel } from '../interfaces/user/IUserModel';
 import { User } from '../database/models/User';
-import { CreationUser, IUser, UserWithoutId, UserWithoutPassword } from '../interfaces/user/IUser';
-import { Types, Document } from 'mongoose';
-
-type UserWithMongoId = Document<unknown, {}, IUser> & IUser & {
-  _id: Types.ObjectId;
-};
+import { CreationUser, IUser, UserWithoutId } from '../interfaces/user/IUser';
+import { EntityWithMongoId } from '../interfaces/EntityWithMongoId';
 
 export class UserModelMongo implements IUserModel {
   async findAll() {
@@ -51,8 +47,9 @@ export class UserModelMongo implements IUserModel {
     return false;
   }
 
-  #clearUser(user: UserWithMongoId): IUser {
-    const { _id, ...userWithPass } = user.toJSON();
-    return userWithPass;
+  #clearUser(user: EntityWithMongoId<IUser>): IUser {
+    const cleanUser = user.toObject();
+    const { _id, ...userWithoutId } = cleanUser;
+    return userWithoutId;
   }
 }
