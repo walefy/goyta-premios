@@ -25,9 +25,13 @@ export class UserService implements IUserService {
   }
 
   async findById(id: IUser['id']) {
+    if (!this.#isValidId(id)) {
+      return { status: HttpStatusCode.BAD_REQUEST, data: { message: 'Invalid id' } };
+    }
+
     const user = await this.#model.findById(id);
 
-    if (!user) return { status: HttpStatusCode.NOT_FOUND, data: null };
+    if (!user) return { status: HttpStatusCode.NOT_FOUND, data: { message: 'User not found' } };
 
     const userWithoutPass = this.#removePassword(user);
     return { status: HttpStatusCode.OK, data: userWithoutPass };
@@ -62,7 +66,7 @@ export class UserService implements IUserService {
   async createAdmin(newUser: CreationUser, tokenAdmin: string) {
     const validation = validateSchema(userCreationSchema, newUser);
 
-    if (!validation.valid) {
+    if (!validation.valid || !tokenAdmin) {
       return {
         status: HttpStatusCode.BAD_REQUEST,
         data: { message: validation.error || 'Invalid data' },
@@ -70,6 +74,7 @@ export class UserService implements IUserService {
     }
 
     if (tokenAdmin !== process.env.ADMIN_PASS) {
+      
       return {
         status: HttpStatusCode.UNAUTHORIZED,
         data: { message: 'Invalid tokenAdmin' }
@@ -126,6 +131,10 @@ export class UserService implements IUserService {
   }
 
   async delete(id: IUser['id']) {
+    if (!this.#isValidId(id)) {
+      return { status: HttpStatusCode.BAD_REQUEST, data: { message: 'Invalid id' } };
+    }
+
     const hasDeleted = await this.#model.delete(id);
 
     if (hasDeleted) return { status: HttpStatusCode.OK, data: null };
@@ -133,6 +142,10 @@ export class UserService implements IUserService {
   }
 
   async update(id: IUser['id'], partialUser: Partial<UserWithoutId>) {
+    if (!this.#isValidId(id)) {
+      return { status: HttpStatusCode.BAD_REQUEST, data: { message: 'Invalid id' } };
+    }
+
     const validation = validateSchema(userUpdateSchema, partialUser);
 
     if (!validation.valid) {
@@ -143,7 +156,6 @@ export class UserService implements IUserService {
     }
     
     const user = await this.#model.findById(id);
-  
     if (!user) {
       return {
         status: HttpStatusCode.NOT_FOUND,
@@ -173,5 +185,10 @@ export class UserService implements IUserService {
   #removePassword(user: IUser): UserWithoutPassword {
     const { password, ...rest } = user;
     return rest;
+  }
+
+  #isValidId(id: string) {
+    const regex = /^[0-9a-fA-F]{24}$/;
+    return regex.test(id);
   }
 }

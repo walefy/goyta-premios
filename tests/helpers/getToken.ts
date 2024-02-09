@@ -10,8 +10,13 @@ export const getToken = async (app: Express) => {
 };
 
 export const getAdminToken = async (app: Express) => {
+  process.env.ADMIN_PASS = 'adminTestPass'
   const newEmail = `test${Math.random()}@test.com`;
-  const { body } = await supertest(app).post('/user/admin').send({ ...validCreationUser, email: newEmail });
+  const { body } = await supertest(app).post('/user/admin').send({
+    ...validCreationUser,
+    email: newEmail,
+    tokenAdmin: process.env.ADMIN_PASS
+  });
   
   return `Bearer ${body.token}`;
 };
