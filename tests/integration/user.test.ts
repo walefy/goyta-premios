@@ -186,8 +186,6 @@ describe('Integration test (User)', () => {
     expect(response.body).toEqual({ message: 'Invalid email or password' });
   });
 
-  // update user
-
   it('should update user name', async () => {
     const request = supertest(app);
     const token = await getToken(app);
