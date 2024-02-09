@@ -193,7 +193,7 @@ export class TicketService implements ITicketService {
     }
 
     const expirationDate = new Date();
-    expirationDate.setMinutes(expirationDate.getMinutes() + 5);
+    expirationDate.setMinutes(expirationDate.getMinutes() + 10);
 
     const body = {
       amount: ticket.price,
