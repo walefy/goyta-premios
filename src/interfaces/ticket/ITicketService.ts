@@ -1,7 +1,13 @@
+import { HttpStatusCode } from '../../enums/HttpStatusCode';
 import { IServiceResponse } from '../IServiceResponse';
 import { CreatePaymentWithoutId } from '../Payment/IPayment';
 import { IPrizeWithoutDrawNumber } from './IPrize';
 import { CreationTicket, ReturnTicket, UpdateTicket } from './ITicket';
+
+export type WebHookNotificationReturn = {
+  status: HttpStatusCode.OK;
+  data: null;
+};
 
 export interface ITicketService {
   create(newTicket: CreationTicket): Promise<IServiceResponse<ReturnTicket>>;
@@ -12,4 +18,5 @@ export interface ITicketService {
   addPrize(ticketId: string, prize: IPrizeWithoutDrawNumber): Promise<IServiceResponse<ReturnTicket>>;
   removePrize(ticketId: string, prizeId: string): Promise<IServiceResponse<ReturnTicket>>;
   buyQuota(ticketId: string, userId: string, drawnNumber: string): Promise<IServiceResponse<CreatePaymentWithoutId>>;
+  confirmBuyQuota(ticketId: string, paymentId: string): Promise<WebHookNotificationReturn>;
 }

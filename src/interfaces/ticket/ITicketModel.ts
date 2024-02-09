@@ -1,9 +1,9 @@
-import { CreationTicket, ITicket } from './ITicket';
+import { CreationTicket, ITicket, TicketWithoutId } from './ITicket';
 import { IPrize } from './IPrize';
 import { IQuota } from './IQuota';
 
 export interface ITicketModel {
-  create(newTicket: CreationTicket): Promise<ITicket>;
+  create(newTicket: TicketWithoutId): Promise<ITicket>;
   findAll(): Promise<ITicket[]>;
   findById(id: string): Promise<ITicket | null>;
   update(id: string, ticket: Partial<ITicket>): Promise<ITicket>;
@@ -13,4 +13,5 @@ export interface ITicketModel {
   addQuotas(ticketId: string, quotas: IQuota[]): Promise<ITicket | null>;
   buyQuotaByDrawnNumber(ticketId: string, number: string, buyerId: string, paymentId: string, status: 'sold' | 'pending'): Promise<ITicket>;
   buyQuotasByDrawnNumbers(ticketId: string, numbers: string[], buyerId: string, paymentId: string): Promise<ITicket>;
+  cancelQuotaByPaymentId(ticketId: string, paymentId: string): Promise<ITicket>;
 }

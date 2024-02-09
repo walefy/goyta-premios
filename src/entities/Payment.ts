@@ -21,7 +21,13 @@ export class MercadoPagoPayment implements IPayment {
     this.#paymentRefund = new PaymentRefund(config);
   }
 
-  async create(amount: number, payerEmail: string, description: string, dateOfExpiration: string) {
+  async create(
+    amount: number,
+    payerEmail: string,
+    description: string,
+    dateOfExpiration: string,
+    ticketId: string,  
+  ) {
     const paymentResponse = await this.#payment.create({
       body: {
         payment_method_id: 'pix',
@@ -31,7 +37,7 @@ export class MercadoPagoPayment implements IPayment {
           email: payerEmail,
         },
         date_of_expiration: dateOfExpiration,
-        // notification_url: 'https://webhook.site/3e3b3e3e-3e3e-3e3e-3e3e-3e3e3e3e3e3e', // preciso de um endpoint up
+        notification_url: 'https://webhook.site/06c46252-a222-49ce-a772-caf5286996c5', // preciso de um endpoint up
       },
     });
 
@@ -51,7 +57,9 @@ export class MercadoPagoPayment implements IPayment {
   }
 
   async get(id: number) {
+    console.log(id);
     const response = await this.#payment.get({ id });
+    
 
     if (response.status === undefined) {
       throw new Error('Payment not found');

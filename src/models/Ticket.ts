@@ -68,9 +68,16 @@ export class TicketMongoModel implements ITicketModel {
     status: 'sold' | 'pending' = 'sold',
   ) {
     const res = await Ticket.updateOne(
-      { _id: ticketId, 'quotas.drawnNumber': number, 'quotas.status': 'available' },
+      { _id: ticketId },
       {
-        $set: { 'quotas.$.status': status, 'quotas.$.buyer': buyerId, 'quotas.$.paymentId': paymentId }
+        $set: { 
+          'quotas.$[elem].status': status, 
+          'quotas.$[elem].buyer': buyerId, 
+          'quotas.$[elem].paymentId': paymentId 
+        }
+      },
+      {
+        arrayFilters: [{ 'elem.drawnNumber': number, 'elem.status': { '$in': ['available', 'pending'] } }],
       }
     );
 
@@ -107,11 +114,38 @@ export class TicketMongoModel implements ITicketModel {
 
     return ticket;
   }
-  
 
-  #removeMongoId(ticket: EntityWithMongoId<ITicket>): ITicket {
+  async cancelQuotaByPaymentId(ticketId: string, paymentId: string) {
+    const res = await Ticket.updateOne(
+      { _id: ticketId },
+      {
+        $set: { 
+          'quotas.$[elem].status': 'available', 
+          'quotas.$[elem].buyer': null, 
+          'quotas.$[elem].paymentId': null 
+        }
+      },
+      {
+        arrayFilters: [{ 'elem.paymentId': paymentId, 'elem.status': 'pending' }],
+      }
+    );
+
+    if (res.modifiedCount === 0) {
+      throw new Error('Quota not found');
+    }
+
+    const ticket = await this.findById(ticketId);
+
+    if (!ticket) {
+      throw new Error('Ticket not found');
+    }
+
+    return ticket;
+  }
+  
+  #removeMongoId(ticket: EntityWithMongoId<Omit<ITicket, 'id'>>): ITicket {
     const cleanTicket = ticket.toObject();
     const { _id, ...ticketWithoutId } = cleanTicket;
-    return ticketWithoutId;
+    return { id: _id.toString(), ...ticketWithoutId };
   }
 }

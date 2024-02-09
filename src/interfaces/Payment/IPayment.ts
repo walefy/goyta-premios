@@ -9,7 +9,13 @@ export interface CreatePaymentResult {
 export type CreatePaymentWithoutId = Omit<CreatePaymentResult, 'id'>;
 
 export interface IPayment {
-  create(amount: number, payerEmail: string, description: string, dateOfExpiration: string): Promise<CreatePaymentResult>;
+  create(
+    amount: number,
+    payerEmail: string,
+    description: string,
+    dateOfExpiration: string,
+    ticketId: string
+  ): Promise<CreatePaymentResult>;
   get(id: number): Promise<string>;
   cancel(id: number): Promise<string>;
   refund(id: number): Promise<void>;

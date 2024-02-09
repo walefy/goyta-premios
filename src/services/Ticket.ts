@@ -1,6 +1,5 @@
-import { ITicketService } from '../interfaces/ticket/ITicketService';
+import { ITicketService, WebHookNotificationReturn } from '../interfaces/ticket/ITicketService';
 import { HttpStatusCode } from '../enums/HttpStatusCode';
-import { TicketMongoModel } from '../models/Ticket';
 import { CreationTicket, ReturnTicket, UpdateTicket } from '../interfaces/ticket/ITicket';
 import { ITicket } from '../interfaces/ticket/ITicket';
 import { IQuota } from '../interfaces/ticket/IQuota';
@@ -9,13 +8,14 @@ import { validateSchema } from '../utils/schemaValidator';
 import { ticketCreationSchema } from '../schemas/ticket/ticketCreationSchema';
 import { IPayment } from '../interfaces/Payment/IPayment';
 import { IUserModel } from '../interfaces/user/IUserModel';
+import { ITicketModel } from '../interfaces/ticket/ITicketModel';
 
 export class TicketService implements ITicketService {
-  #model: TicketMongoModel;
+  #model: ITicketModel;
   #payment: IPayment;
   #userModel: IUserModel;
 
-  constructor(model: TicketMongoModel, payment: IPayment, userModel: IUserModel) {
+  constructor(model: ITicketModel, payment: IPayment, userModel: IUserModel) {
     this.#model = model;
     this.#payment = payment;
     this.#userModel = userModel;
@@ -143,6 +143,14 @@ export class TicketService implements ITicketService {
   }
 
   async buyQuota(ticketId: string, userId: string, drawnNumber: string) {
+    // TODO: add limit of quotas per user
+    if (!userId || !drawnNumber) {
+      return {
+        status: HttpStatusCode.BAD_REQUEST,
+        data: { message: 'Missing parameters userId or drawnNumber' }
+      }
+    }
+
     const ticket = await this.#model.findById(ticketId);
 
     if (!ticket) {
@@ -160,7 +168,7 @@ export class TicketService implements ITicketService {
       }
     }
 
-    if (quota.status === 'sold') {
+    if (quota.status === 'sold' || quota.status === 'pending') {
       return {
         status: HttpStatusCode.BAD_REQUEST,
         data: { message: 'Quota already sold' }
@@ -184,13 +192,14 @@ export class TicketService implements ITicketService {
       description: `Quota ${drawnNumber} of ticket ${ticketId}`,
       expirationDate: expirationDate.toISOString(),
     }
-
+    
     const { id: paymentId, ...paymentResponse } = await this.#payment.create(
       body.amount,
-      body.description,
       body.payerEmail,
-      body.expirationDate
-    );
+      body.description,
+      body.expirationDate,
+      ticketId,
+    );    
 
     await this.#model.buyQuotaByDrawnNumber(
       ticketId,
@@ -203,20 +212,53 @@ export class TicketService implements ITicketService {
     return { status: HttpStatusCode.OK, data: paymentResponse };
   }
 
+  async confirmBuyQuota(ticketId: string, paymentId: string): Promise<WebHookNotificationReturn> {
+    const status = await this.#payment.get(Number(paymentId));
+
+    const notValidStatus = ['rejected', 'cancelled', 'refunded', 'charged_back'];
+
+    if (notValidStatus.includes(status)) {
+      await this.#model.cancelQuotaByPaymentId(ticketId, paymentId);
+      return { status: HttpStatusCode.OK, data: null };
+    }
+
+    if (status !== 'approved') {
+      return { status: HttpStatusCode.OK, data: null };
+    }
+
+    const ticket = await this.#model.findById(ticketId) as ITicket;
+    const quota = ticket.quotas.find((quota) => quota.paymentId === paymentId) as IQuota;
+    console.log(quota);
+
+
+    await this.#model.buyQuotaByDrawnNumber(
+      ticketId,
+      quota.drawnNumber as string,
+      quota.buyer as string,
+      quota.paymentId as string,
+      'sold'
+    );
+
+    return { status: HttpStatusCode.OK, data: null };
+  }
+
   #generateDrawnNumber(quantity: number) {
-    // this function can change depending on the client's requirements  
-    return Array.from({ length: quantity }, (_, index) => String(index + 1).padStart(10, '0'));
+    return Array.from(
+      { length: quantity },
+      (_, index) => String(index + 1).padStart(String(quantity).length, '0')
+    );
   }
 
   #cleanTicket(ticket: ITicket): ReturnTicket {
+    // remove type (any) to remove _id    
     return {
       ...ticket,
       prizes: ticket.prizes.map((prize) => {
-        const { drawNumber, ...rest } = prize;
+        const { drawNumber, _id, ...rest } = prize as any;
         return rest;
       }),
       quotas: ticket.quotas.map((quota) => {
-        const { paymentId, ...rest } = quota;
+        const { paymentId, _id, ...rest } = quota as any;
         return rest;
       }),
     }

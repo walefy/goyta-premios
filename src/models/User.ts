@@ -47,9 +47,9 @@ export class UserModelMongo implements IUserModel {
     return false;
   }
 
-  #clearUser(user: EntityWithMongoId<IUser>): IUser {
+  #clearUser(user: EntityWithMongoId<Omit<IUser, 'id'>>): IUser {
     const cleanUser = user.toObject();
     const { _id, ...userWithoutId } = cleanUser;
-    return userWithoutId;
+    return { id: _id.toString(), ...userWithoutId };
   }
 }
