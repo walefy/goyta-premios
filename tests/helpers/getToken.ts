@@ -1,19 +1,17 @@
 import { validCreationUser } from '../mocks/users';
-import { App } from '../../src/App';
-import { DatabaseMockClass } from '../mocks/DatabaseMockClass';
 import supertest from 'supertest';
+import { Express } from 'express';
 
-const databaseMock = new DatabaseMockClass();
-const { app } = new App(databaseMock);
-
-export const getToken = async () => {
-  const { body } = await supertest(app).post('/user').send(validCreationUser);
+export const getToken = async (app: Express) => {
+  const newEmail = `test${Math.random()}@test.com`;
+  const { body } = await supertest(app).post('/user').send({ ...validCreationUser, email: newEmail });
 
   return `Bearer ${body.token}`;
 };
 
-export const getAdminToken = async () => {
-  const { body } = await supertest(app).post('/user/admin').send(validCreationUser);
+export const getAdminToken = async (app: Express) => {
+  const newEmail = `test${Math.random()}@test.com`;
+  const { body } = await supertest(app).post('/user/admin').send({ ...validCreationUser, email: newEmail });
   
   return `Bearer ${body.token}`;
 };

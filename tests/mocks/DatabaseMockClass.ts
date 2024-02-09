@@ -27,4 +27,13 @@ export class DatabaseMockClass implements IDatabase {
     await mongoose.disconnect();
     await this.#mongoServer.stop();
   }
+
+  async clearDatabase() {
+    const collections = mongoose.connection.collections;
+
+    for (const key in collections) {
+      const collection = collections[key];
+      await collection.deleteMany({});
+    }
+  }
 }
