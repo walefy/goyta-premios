@@ -6,7 +6,7 @@ export class MercadoPagoPayment implements IPayment {
   #paymentRefund: PaymentRefund;
 
   constructor() {
-    const accessToken = process.env.MP_ACCESS_TOKEN || 'TEST-5068813690404568-020816-41a641f328539d1dd7897c6a18211289-272153962';
+    const accessToken = process.env.MP_ACCESS_TOKEN;
 
     if (!accessToken) {
       throw new Error('Mercado Pago access token not found');
@@ -37,7 +37,7 @@ export class MercadoPagoPayment implements IPayment {
           email: payerEmail,
         },
         date_of_expiration: dateOfExpiration,
-        notification_url: 'https://webhook.site/06c46252-a222-49ce-a772-caf5286996c5', // preciso de um endpoint up, esse é só um exemplo
+        notification_url: 'https://webhook.site/06c46252-a222-49ce-a772-caf5286996c5', // just for testing before the deploy
       },
     });
 
