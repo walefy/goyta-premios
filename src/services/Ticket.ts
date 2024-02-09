@@ -9,6 +9,7 @@ import { ticketCreationSchema } from '../schemas/ticket/ticketCreationSchema';
 import { IPayment } from '../interfaces/Payment/IPayment';
 import { IUserModel } from '../interfaces/user/IUserModel';
 import { ITicketModel } from '../interfaces/ticket/ITicketModel';
+import { ticketUpdateSchema } from '../schemas/ticket/ticketUpdateSchema';
 
 export class TicketService implements ITicketService {
   #model: ITicketModel;
@@ -122,12 +123,20 @@ export class TicketService implements ITicketService {
   }
 
   async update(id: string, ticket: UpdateTicket) {
-    const validation = validateSchema(ticketCreationSchema, ticket)
+    const validation = validateSchema(ticketUpdateSchema, ticket)
 
     if (!validation.valid) {
       return {
         status: HttpStatusCode.BAD_REQUEST,
         data: { message: validation.error || 'Invalid ticket data' }
+      }
+    }
+
+    const ticketExists = await this.#model.findById(id);
+    if (!ticketExists) {
+      return {
+        status: HttpStatusCode.NOT_FOUND,
+        data: { message: 'Ticket not found' }
       }
     }
 

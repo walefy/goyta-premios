@@ -37,7 +37,7 @@ export class MercadoPagoPayment implements IPayment {
           email: payerEmail,
         },
         date_of_expiration: dateOfExpiration,
-        notification_url: 'https://webhook.site/06c46252-a222-49ce-a772-caf5286996c5', // preciso de um endpoint up
+        notification_url: 'https://webhook.site/06c46252-a222-49ce-a772-caf5286996c5', // preciso de um endpoint up, esse é só um exemplo
       },
     });
 
