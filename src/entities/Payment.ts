@@ -57,7 +57,6 @@ export class MercadoPagoPayment implements IPayment {
   }
 
   async get(id: number) {
-    console.log(id);
     const response = await this.#payment.get({ id });
     
 

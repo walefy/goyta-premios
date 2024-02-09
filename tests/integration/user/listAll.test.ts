@@ -22,8 +22,6 @@ describe('List All Users <GET /user>', () => {
     const response = await request
       .get('/user')
       .set('Authorization', token);
-    
-    console.log(response.body);
 
     expect(response.status).toBe(200);
     const { password, ...user } = mongoReturnUser;

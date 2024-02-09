@@ -228,8 +228,6 @@ export class TicketService implements ITicketService {
 
     const ticket = await this.#model.findById(ticketId) as ITicket;
     const quota = ticket.quotas.find((quota) => quota.paymentId === paymentId) as IQuota;
-    console.log(quota);
-
 
     await this.#model.buyQuotaByDrawnNumber(
       ticketId,
