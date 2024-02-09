@@ -1,4 +1,5 @@
-import { userCreationSchema } from './userCreationSchema';
-import { userUpdateSchema } from './userUpdateSchema';
+import { userCreationSchema } from './user/userCreationSchema';
+import { userUpdateSchema } from './user/userUpdateSchema';
+import { loginSchema } from './user/loginSchema';
 
-export { userCreationSchema, userUpdateSchema };
+export { userCreationSchema, userUpdateSchema, loginSchema };

@@ -11,7 +11,6 @@ export interface ITicketModel {
   addPrize(ticketId: string, prize: IPrize): Promise<ITicket | null>;
   removePrize(ticketId: string, prizeId: string): Promise<ITicket | null>;
   addQuotas(ticketId: string, quotas: IQuota[]): Promise<ITicket | null>;
-  buyQuotaById(ticketId: string, quotaId: string, buyerId: string, paymentId: string): Promise<ITicket>;
-  buyQuotaByDrawnNumber(ticketId: string, number: string, buyerId: string, paymentId: string): Promise<ITicket>;
+  buyQuotaByDrawnNumber(ticketId: string, number: string, buyerId: string, paymentId: string, status: 'sold' | 'pending'): Promise<ITicket>;
   buyQuotasByDrawnNumbers(ticketId: string, numbers: string[], buyerId: string, paymentId: string): Promise<ITicket>;
 }

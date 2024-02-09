@@ -1,4 +1,4 @@
-import { CreationTicket, ITicket } from '../interfaces/ticket/ITicket';
+import { ITicket, TicketWithoutId } from '../interfaces/ticket/ITicket';
 import { ITicketModel } from '../interfaces/ticket/ITicketModel';
 import { Ticket } from '../database/models/Ticket';
 import { IPrize } from '../interfaces/ticket/IPrize';
@@ -6,7 +6,7 @@ import { IQuota } from '../interfaces/ticket/IQuota';
 import { EntityWithMongoId } from '../interfaces/EntityWithMongoId';
 
 export class TicketMongoModel implements ITicketModel {
-  async create(newTicket: CreationTicket) {
+  async create(newTicket: TicketWithoutId) {
     const ticket = await Ticket.create(newTicket);
     return this.#removeMongoId(ticket);
   }
@@ -22,7 +22,7 @@ export class TicketMongoModel implements ITicketModel {
     return this.#removeMongoId(ticket);
   }
 
-  async update(id: string, ticket: Partial<ITicket>) {
+  async update(id: string, ticket: Partial<TicketWithoutId>) {
     await Ticket.updateOne({ _id: id }, ticket);
 
     const updatedTicket = await this.findById(id);
@@ -60,11 +60,17 @@ export class TicketMongoModel implements ITicketModel {
     return ticket;
   }
 
-  async buyQuotaByDrawnNumber(ticketId: string, number: string, buyerId: string, paymentId: string) {
+  async buyQuotaByDrawnNumber(
+    ticketId: string,
+    number: string,
+    buyerId: string,
+    paymentId: string,
+    status: 'sold' | 'pending' = 'sold',
+  ) {
     const res = await Ticket.updateOne(
       { _id: ticketId, 'quotas.drawnNumber': number, 'quotas.status': 'available' },
       {
-        $set: { 'quotas.$.status': 'sold', 'quotas.$.buyer': buyerId, 'quotas.$.paymentId': paymentId }
+        $set: { 'quotas.$.status': status, 'quotas.$.buyer': buyerId, 'quotas.$.paymentId': paymentId }
       }
     );
 
@@ -78,26 +84,6 @@ export class TicketMongoModel implements ITicketModel {
       throw new Error('Ticket not found');
     }
     
-    return ticket;
-  }
-
-  async buyQuotaById(ticketId: string, quotaId: string, buyerId: string, paymentId: string) {
-    const res = await Ticket.updateOne(
-      { _id: ticketId, 'quotas._id': quotaId, 'quotas.status': 'available' },
-      {
-        $set: { 'quotas.$.status': 'sold', 'quotas.$.buyer': buyerId, 'quotas.$.paymentId': paymentId }
-      }
-    );
-
-    if (res.modifiedCount === 0) {
-      throw new Error('Quota not found');
-    }
-
-    const ticket = await this.findById(ticketId);
-    if (!ticket) {
-      throw new Error('Ticket not found');
-    }
-
     return ticket;
   }
 

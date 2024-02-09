@@ -5,3 +5,6 @@ export interface IPrize {
   images: string[];
   equivalentPrice: number;
 }
+
+export type IPrizeWithoutDrawNumber = Omit<IPrize, 'drawNumber'>;
+

@@ -4,8 +4,7 @@ import { IPassword } from '../interfaces/Password/IPassword';
 import { CreationUser, IUser, UserWithoutId, UserWithoutPassword } from '../interfaces/user/IUser';
 import { IUserModel } from '../interfaces/user/IUserModel';
 import { IUserService } from '../interfaces/user/IUserService';
-import { userCreationSchema, userUpdateSchema } from '../schemas';
-import { loginSchema } from '../schemas/loginSchema';
+import { userCreationSchema, userUpdateSchema, loginSchema } from '../schemas';
 import { validateSchema } from '../utils/schemaValidator';
 
 export class UserService implements IUserService {

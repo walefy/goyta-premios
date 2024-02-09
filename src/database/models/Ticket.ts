@@ -9,7 +9,7 @@ const prizesSchema = new Schema<IPrize>({
     required: true,
   },
   drawNumber: {
-    type: Number,
+    type: String,
     required: true,
   },
   description: {
@@ -26,7 +26,7 @@ const prizesSchema = new Schema<IPrize>({
 const quotaSchema = new Schema<IQuota>({
   paymentId: String,
   drawnNumber: {
-    type: Number,
+    type: String,
     required: true,
   },
   status: {
@@ -52,7 +52,6 @@ export const ticketSchema = new Schema<ITicket>({
   startDate: {
     type: Date,
     required: true,
-    default: Date.now,
   },
   endDate: Date,
   price: {
