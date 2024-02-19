@@ -1,6 +1,7 @@
 import express from 'express';
 import { IDatabase } from './interfaces/IDatabase';
 import { mainRouter } from './routes';
+import cors from 'cors';
 
 export class App {
   public app: express.Express;
@@ -9,6 +10,7 @@ export class App {
   constructor(database: IDatabase) {
     this.app = express();
     this.#config();
+    this.app.use(cors())
     this.#routes();
     this.app.get('/', (_req, res) => res.json({ ok: true }));
     this.#database = database;
