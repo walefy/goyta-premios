@@ -6,7 +6,7 @@ export class MercadoPagoPayment implements IPayment {
   #paymentRefund: PaymentRefund;
 
   constructor() {
-    const accessToken = process.env.MP_TOKEN_API;
+    const accessToken = process.env.MP_TOKEN_API || 'justForTesting';
 
     if (!accessToken) {
       throw new Error('Mercado Pago access token not found');
@@ -33,6 +33,18 @@ export class MercadoPagoPayment implements IPayment {
         payment_method_id: 'pix',
         transaction_amount: amount,
         description: description,
+        additional_info: {
+          items: [
+            {
+              id: ticketId,
+              title: description,
+              description: description,
+              quantity: 1,
+              unit_price: amount,
+              category_id: 'tickets',
+            },
+          ],
+        },
         payer: {
           email: payerEmail,
         },

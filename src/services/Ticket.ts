@@ -10,6 +10,7 @@ import { IPayment } from '../interfaces/Payment/IPayment';
 import { IUserModel } from '../interfaces/user/IUserModel';
 import { ITicketModel } from '../interfaces/ticket/ITicketModel';
 import { ticketUpdateSchema } from '../schemas/ticket/ticketUpdateSchema';
+import { formatInTimeZone } from 'date-fns-tz';
 
 export class TicketService implements ITicketService {
   #model: ITicketModel;
@@ -192,14 +193,22 @@ export class TicketService implements ITicketService {
       }
     }
 
-    const expirationDate = new Date();
-    expirationDate.setMinutes(expirationDate.getMinutes() + 10);
+    const quotaByUser = ticket.quotas.filter(
+      (quota) => quota.buyer === userId && quota.status === 'pending'
+    );
+
+    if (quotaByUser.length >= 3) {
+      return {
+        status: HttpStatusCode.BAD_REQUEST,
+        data: { message: 'User already has 3 quotas pending' }
+      }
+    }
 
     const body = {
       amount: ticket.price,
       payerEmail: user.email,
       description: `Quota ${drawnNumber} of ticket ${ticketId}`,
-      expirationDate: expirationDate.toISOString(),
+      expirationDate: this.#generateExpirationDate(),
     }
     
     const { id: paymentId, ...paymentResponse } = await this.#payment.create(
@@ -269,5 +278,12 @@ export class TicketService implements ITicketService {
         return rest;
       }),
     }
+  }
+
+  #generateExpirationDate() {
+    const expirationDate = new Date();
+    const timeZone = 'America/Sao_Paulo';
+    expirationDate.setMinutes(expirationDate.getMinutes() + 5);
+    return formatInTimeZone(expirationDate, timeZone, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
   }
 }

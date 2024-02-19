@@ -387,4 +387,13 @@ describe('Integration test (Ticket)', () => {
     expect(response.body).toHaveProperty('externalUrl', 'https://www.test.com');
     expect(response.body).toHaveProperty('qrCodeBase64', 'qrCodeBase64');
   });
+
+  it('should not buy a quota without a token', async () => {
+    const response = await supertest(app)
+      .post('/ticket/65c660383c4b817eb7f722ec/buy-quota')
+      .send({ drawnNumber: '1', userId: '65c660383c4b817eb7f722ec' });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message', 'Token not found');
+  });
 });
