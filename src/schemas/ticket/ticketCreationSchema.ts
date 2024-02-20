@@ -6,6 +6,6 @@ export const ticketCreationSchema = z.object({
   description: z.string().min(10),
   price: z.number().min(0.01),
   quantity: z.number().min(1),
-  limitByUser: z.number().min(1).optional(),
+  limitByUser: z.number().min(1),
   prizes: z.array(creationPrizeSchema),
 });

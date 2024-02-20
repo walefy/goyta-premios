@@ -14,23 +14,24 @@ export class UserController {
   }
 
   async create(req: Request, res: Response) {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, image } = req.body;
 
     const { status, data } = await this.#service.create({
       name,
       email,
       password,
       phone,
+      image,
     });
 
     return res.status(status).json(data);
   }
 
   async createAdmin(req: Request, res: Response) {
-    const { name, email, password, phone, tokenAdmin } = req.body;
+    const { name, email, password, phone, image, tokenAdmin } = req.body;
 
     const { status, data } = await this.#service.createAdmin(
-      { name, email, password, phone },
+      { name, email, password, phone, image },
       tokenAdmin
     );
 

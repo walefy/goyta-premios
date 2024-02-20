@@ -34,6 +34,14 @@ export class TicketService implements ITicketService {
     }
 
     const drawnNumbers = this.#generateDrawnNumber(newTicket.quantity);
+    const drawnNumberCopy = [...drawnNumbers];
+    const prizes = newTicket.prizes.map((prize) => {
+      const index = Math.floor(Math.random() * drawnNumberCopy.length);
+      const drawNumber = drawnNumberCopy[index];
+      drawnNumberCopy.splice(index, 1);
+      return { ...prize, drawNumber: drawNumber };
+    });
+
     const quotas: IQuota[] = drawnNumbers.map((drawnNumber) => ({
       drawnNumber,
       status: 'available',
@@ -44,7 +52,7 @@ export class TicketService implements ITicketService {
     const startDate = new Date();
     const endDate = null;
     const status = 'running';
-    const ticket = await this.#model.create({ ...newTicket, quotas, startDate, endDate, status });
+    const ticket = await this.#model.create({ ...newTicket, prizes, quotas, startDate, endDate, status });
     const cleanedTicket = this.#cleanTicket(ticket);
 
     return { status: HttpStatusCode.CREATED, data: cleanedTicket };

@@ -18,6 +18,10 @@ export const jwtAuth = (needsAdmin = false) => async (req: Request, res: Respons
   
   if (!decoded) return res.status(401).json({ message: 'Invalid token' });
 
+  const user = await User.findOne({ email: decoded.email });
+
+  if (!user) return res.status(401).json({ message: 'Invalid token' });
+
   if (needsAdmin) {
     if (decoded.role !== 'admin') {
       return res.status(403).json({ message: 'You do not have permission' });
