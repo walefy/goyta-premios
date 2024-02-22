@@ -202,7 +202,7 @@ export class TicketService implements ITicketService {
     }
 
     const quotaByUser = ticket.quotas.filter(
-      (quota) => quota.buyer === userId && quota.status === 'pending'
+      (quota) => quota.buyer?.toString() === userId && quota.status === 'pending'
     );
 
     if (quotaByUser.length >= 3) {
@@ -258,7 +258,7 @@ export class TicketService implements ITicketService {
     await this.#model.buyQuotaByDrawnNumber(
       ticketId,
       quota.drawnNumber as string,
-      quota.buyer as string,
+      quota.buyer?.toString() as string,
       quota.paymentId as string,
       'sold'
     );
