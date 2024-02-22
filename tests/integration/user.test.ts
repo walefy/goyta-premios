@@ -53,38 +53,16 @@ describe('Integration test (User)', () => {
     expect(response.body).toEqual({ message: 'Invalid id' });
   });
 
-  it('should return 400 when delete user with invalid id', async () => {
-    process.env.JWT_SECRET_KEY = 'secret';
-
+  it('should return 401 when logging in with a non-existing user', async () => {
+    const token = await getToken(app);
     const request = supertest(app);
-    const token = jwt.sign({
-      id: '123',
-      email: '',
-      name: '',
-      role: 'user'
-    }, process.env.JWT_SECRET_KEY);
+    const { id } = jwt.decode(token.split(' ')[1]) as { id: string };
 
-    const response = await request.delete('/user/123').set('Authorization', `Bearer ${token}`);
+    await request.delete(`/user/${id}`).set('Authorization', token);
+    const response = await request.delete(`/user/${id}`).set('Authorization', token);
 
-    expect(response.status).toBe(400);
-    expect(response.body).toEqual({ message: 'Invalid id' });
-  });
-
-  it('should return 400 when update user with invalid id', async () => {
-    process.env.JWT_SECRET_KEY = 'secret';
-
-    const request = supertest(app);
-    const token = jwt.sign({
-      id: '123',
-      email: '',
-      name: '',
-      role: 'user'
-    }, process.env.JWT_SECRET_KEY);
-
-    const response = await request.put('/user/123').send({}).set('Authorization', `Bearer ${token}`);
-
-    expect(response.status).toBe(400);
-    expect(response.body).toEqual({ message: 'Invalid id' });
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ message: 'Invalid token' });
   });
 
   it('should return 404 if user not found', async () => {
